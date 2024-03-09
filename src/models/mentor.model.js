@@ -1,4 +1,6 @@
 import mongoose from "mongoose";
+import bcrypt from "bcrypt";
+import jwt from "jsonwebtoken";
 
 const mentorSchema = new mongoose.Schema({
     name:{
@@ -23,6 +25,57 @@ const mentorSchema = new mongoose.Schema({
         type: Number,
         default: 0,
     },
+    refreshToken:{
+        type: String
+    },
+    reviews: [
+        {
+            userId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            review: {
+                type: String,
+                required: true
+            },
+        }
+    ]
 }, {timestamps: true});
+
+mentorSchema.pre('save', async function(next){
+    if(this.isModified('password')){
+        this.password = await bcrypt.hash(this.password, 10);
+    }
+    next();
+});
+
+mentorSchema.methods.isPasswordCorrect = async function(password){
+    return await bcrypt.compare(password, this.password)
+}
+
+mentorSchema.methods.generateAccessToken = function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            userName: this.userName
+        },
+        process.env.ACCESS_TOKEN_SECRET,
+        {expiresIn: process.env.ACCESS_TOKEN_EXPIRY}
+    );
+};
+
+mentorSchema.methods.generateRefreshToken = function(){
+    return jwt.sign(
+        {
+            _id: this._id,
+            email: this.email,
+            userName: this.userName,
+            password: this.password,
+        },
+        process.env.REFRESH_TOKEN_SECRET,
+        {expiresIn: process.env.REFRESH_TOKEN_EXPIRY}
+    );
+};
 
 export const Mentor = mongoose.model('Mentor', mentorSchema);

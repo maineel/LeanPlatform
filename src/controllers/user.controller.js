@@ -119,24 +119,25 @@ const logoutUser = asyncHandler(async (req, res) => {
 const rateMentor = asyncHandler(async (req, res) => {
     const { mentorId, userId, rating } = req.body;
 
-    if(!mentorId || !userId || !rating ){
+    if(!mentorId || !userId || !rating && rating !== 0){
         throw new ApiError(400, 'All fields are required');
     }
 
-    if(rating < 0 || rating > 5){
+    if(rating < 1 || rating > 5){
         throw new ApiError(400, 'Rating should be between 1 and 5');
     }
-    
-    const userExists = await User.findOne({userId});
-    const mentorExists = await Mentor.findOne({mentorId});
+
+    const userExists = await User.findById(userId);
+    const mentorExists = await Mentor.findById(mentorId);
 
     if(!userExists || !mentorExists){
         throw new ApiError(400, 'User or Mentor does not exist');
     }
 
     const mentor = await Mentor.findById(mentorId);
+    const oldRating = mentor.overallRating * mentor.numRatings;
     mentor.numRatings += 1;
-    mentor.overallRating = (mentor.overallRating + rating) / mentor.numRatings;
+    mentor.overallRating = (oldRating + rating) / mentor.numRatings;
 
     await mentor.save();
 
@@ -146,4 +147,49 @@ const rateMentor = asyncHandler(async (req, res) => {
 
 });
 
-export { registerUser, loginUser, logoutUser, rateMentor };
+const reviewMentor = asyncHandler(async (req, res) => {
+    const { mentorId, userId, review } = req.body;
+
+    if(!mentorId || !userId || !review){
+        throw new ApiError(400, 'All fields are required');
+    }
+
+    if(review.length > 50){
+        throw new ApiError(400, 'Review should be less than 50 characters');
+    }
+
+    const userExists = await User.findById(userId);
+    const mentorExists = await Mentor.findById(mentorId);
+
+    if(!userExists || !mentorExists){
+        throw new ApiError(400, 'User or Mentor does not exist');
+    }
+
+    const mentor = await Mentor.findById(mentorId);
+    mentor.reviews.push({userId, review});
+    await mentor.save();
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, mentor, "Mentor reviewed successfully"))
+});
+
+const getMentorDetails = asyncHandler(async (req, res) => {
+    const {mentorId} = req.body;
+
+    if(!mentorId){
+        throw new ApiError(400, 'Mentor ID is required');
+    }
+
+    const mentor = await Mentor.findById(mentorId,{name:1, email:1, overallRating:1, numRatings:1, reviews:1});
+
+    if(!mentor){
+        throw new ApiError(404, 'Mentor not found');
+    }
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, mentor, "Mentor details fetched successfully"));
+});
+
+export { registerUser, loginUser, logoutUser, rateMentor, reviewMentor, getMentorDetails };
