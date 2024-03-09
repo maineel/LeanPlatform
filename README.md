@@ -1,1 +1,1 @@
-## Backend Assignment for **Lean Platforms**
+## Backend Assignment for **Lean Platform Technologies**
