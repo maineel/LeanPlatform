@@ -93,19 +93,23 @@ const loginMentor = asyncHandler(async (req, res) => {
 });
 
 const logoutMentor = asyncHandler(async (req, res) => {
-    
-    const { user } = req.user;
-    
-    if(!user){
+
+    const { _id } = req.user._id;
+
+    if(!_id){
         throw new ApiError(401, "Mentor not found");
     }
 
-    user.refreshToken = "";
-    await user.save();
+    const mentor = await Mentor.findById(_id);
+
+    mentor.refreshToken = "";
+    await mentor.save();
+
     const options = {
         httpOnly: true,
         secure: true,
     };
+
     return res
     .status(200)
     .clearCookie("accessToken", options)
@@ -133,7 +137,7 @@ const recommendStudent = asyncHandler(async (req, res) => {
         throw new ApiError(404, 'Student not found');
     }
 
-    const mentor = await Mentor.findById(mentorId);
+    const mentor = await Mentor.findById(mentorId,{recommendations:1});
 
     if(!mentor){
         throw new ApiError(404, 'Mentor not found');
