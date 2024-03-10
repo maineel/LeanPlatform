@@ -91,8 +91,8 @@ const loginUser = asyncHandler(async (req, res) => {
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
-    const user = req.user;
     
+    const user = req.user;
     if(!user){
         throw new ApiError(401, "User not found");
     }
@@ -126,6 +126,10 @@ const rateMentor = asyncHandler(async (req, res) => {
     if(rating < 1 || rating > 5){
         throw new ApiError(400, 'Rating should be between 1 and 5');
     }
+    
+    if(rating%1 !== 0){
+        throw new ApiError(400, 'Rating should be an integer between 1 and 5');
+    }
 
     const userExists = await User.findById(userId);
     const mentorExists = await Mentor.findById(mentorId);
@@ -137,7 +141,7 @@ const rateMentor = asyncHandler(async (req, res) => {
     const mentor = await Mentor.findById(mentorId);
     const oldRating = mentor.overallRating * mentor.numRatings;
     mentor.numRatings += 1;
-    mentor.overallRating = (oldRating + rating) / mentor.numRatings;
+    mentor.overallRating = Math.round((oldRating + rating) / mentor.numRatings);
 
     await mentor.save();
 
@@ -175,21 +179,57 @@ const reviewMentor = asyncHandler(async (req, res) => {
 });
 
 const getMentorDetails = asyncHandler(async (req, res) => {
-    const {mentorId} = req.body;
+    const {mentorId, rating} = req.body;
 
-    if(!mentorId){
-        throw new ApiError(400, 'Mentor ID is required');
+    if(!mentorId || !rating && rating !== 0){
+        throw new ApiError(400, 'All fields are required');
     }
 
-    const mentor = await Mentor.findById(mentorId,{name:1, email:1, overallRating:1, numRatings:1, reviews:1});
+    if(rating < 1 || rating > 5){
+        throw new ApiError(400, 'Rating should be between 1 and 5');
+    }
+
+    if(rating%1 !== 0){
+        throw new ApiError(400, 'Rating should be an integer between 1 and 5');
+    }
+
+    const mentor = await Mentor.find({"overallRating":rating},{name:1, email:1, overallRating:1, numRatings:1, reviews:1});
 
     if(!mentor){
-        throw new ApiError(404, 'Mentor not found');
+        throw new ApiError(404, `Mentors with given ${rating} not found`);
     }
 
+    if(mentor.length === 0){
+        return res
+        .status(200)
+        .json(new ApiResponse(200, mentor, `No mentors with rating: ${rating}`));
+    }
+    
     return res
     .status(200)
     .json(new ApiResponse(200, mentor, "Mentor details fetched successfully"));
 });
 
-export { registerUser, loginUser, logoutUser, rateMentor, reviewMentor, getMentorDetails };
+const getRecommendations = asyncHandler(async (req, res) => {
+    const {link} = req.body;
+    
+    if(!link){
+        throw new ApiError(400, 'Link is required');
+    }
+    
+    const mentor = await Mentor.findOne({ 'recommendations.shareableLink': link }).select("-password -refreshToken -numRatings -overallRating -createdAt -updatedAt -__v -reviews -id");
+
+    if (!mentor) {
+        throw new ApiError(404, 'Recommendation not found');
+    }
+
+    const recommendation = mentor.recommendations.find(rec => rec.shareableLink === link);
+
+    const details = recommendation.userId;
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {mentor}, "Recommendation fetched successfully"));
+});
+
+export { registerUser, loginUser, logoutUser, rateMentor, reviewMentor, getMentorDetails, getRecommendations };

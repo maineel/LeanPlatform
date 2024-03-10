@@ -52,6 +52,7 @@ const registerMentor = asyncHandler(async (req, res) => {
 });
 
 const loginMentor = asyncHandler(async (req, res) => {
+
     const { email, password } = req.body;
     if(!email || !password){
         throw new ApiError(400, 'All fields are required');
@@ -92,14 +93,15 @@ const loginMentor = asyncHandler(async (req, res) => {
 });
 
 const logoutMentor = asyncHandler(async (req, res) => {
-    const mentor = req.mentor;
     
-    if(!mentor){
+    const { user } = req.user;
+    
+    if(!user){
         throw new ApiError(401, "Mentor not found");
     }
 
-    mentor.refreshToken = "";
-    await mentor.save();
+    user.refreshToken = "";
+    await user.save();
     const options = {
         httpOnly: true,
         secure: true,
@@ -118,4 +120,48 @@ const logoutMentor = asyncHandler(async (req, res) => {
 });
 
 
-export { registerMentor, loginMentor, logoutMentor}
+const recommendStudent = asyncHandler(async (req, res) => {
+    const { studentId, mentorId, review } = req.body;
+
+    if(!studentId || !mentorId || !review){
+        throw new ApiError(400, 'All fields are required');
+    }
+
+    const student = await User.findById(studentId);
+    
+    if(!student){
+        throw new ApiError(404, 'Student not found');
+    }
+
+    const mentor = await Mentor.findById(mentorId);
+
+    if(!mentor){
+        throw new ApiError(404, 'Mentor not found');
+    }
+
+    const link = "LeanPlatforms/recommendations/" + mentorId + "/" + studentId;
+
+    mentor.recommendations.push({
+        studentId: studentId,
+        recommendation: review,
+        shareableLink: link
+    });
+
+    student.recommendations.push({
+        mentorId: mentorId,
+        recommendation: review,
+        shareableLink: link
+    });
+
+    await mentor.save();
+    await student.save();
+
+    return res
+    .status(200)
+    .json(new ApiResponse(200, {mentor}, "Student recommended successfully"))
+
+});
+
+
+
+export { registerMentor, loginMentor, logoutMentor, recommendStudent}

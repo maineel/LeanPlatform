@@ -20,6 +20,22 @@ const userSchema = new mongoose.Schema({
     refreshToken:{
         type:String 
     },
+    recommendations:[
+        {
+            mentorId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            recommendation: {
+                type: String,
+                required: true
+            },
+            shareableLink: {
+                type: String,
+                unique: true
+            }
+        }
+    ]
 }, {timestamps: true});
 
 userSchema.pre('save', async function(next){

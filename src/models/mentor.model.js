@@ -39,6 +39,22 @@ const mentorSchema = new mongoose.Schema({
                 required: true
             },
         }
+    ],
+    recommendations:[
+        {
+            studentId: {
+                type: mongoose.Schema.Types.ObjectId,
+                ref: 'User'
+            },
+            recommendation: {
+                type: String,
+                required: true
+            },
+            shareableLink: {
+                type: String,
+                unique: true
+            }
+        }
     ]
 }, {timestamps: true});
 
