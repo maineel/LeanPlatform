@@ -4,7 +4,7 @@
 ### **API Endpoints**
 
 Home Page: "localhost:{port}/" [GET]
-
+-------------------------------------------------------------------------------------------------------------------------------------------
 #### **Users**
 ##### Base URL: localhost:{port}/api/v1/users
   1.  Register User: "/register" [POST]
@@ -14,7 +14,7 @@ Home Page: "localhost:{port}/" [GET]
   5.  Review Mentor: "/reviewMentor" [POST]
   6.  Get Mentor Details: "/getMentorDetails" [GET]
   7.  Get Recommendation: "/getRecommendation" [GET]
-
+-------------------------------------------------------------------------------------------------------------------------------------------
 #### **Mentors**
 ##### Base URL: localhost:{port}/api/v1/mentors
   1.  Register Mentor: "/register" [POST]
