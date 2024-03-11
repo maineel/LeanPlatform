@@ -3,6 +3,8 @@
 ## **Neel Sheth | neel.s2@ahduni.edu.in | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)**
 ### **API Endpoints**
 
+Use command: npm run dev to start your local server
+
 Home Page: "localhost:{port}/" [GET]
 
 -------------------------------------------------------------------------------------------------------------------------------------------
@@ -23,5 +25,6 @@ Home Page: "localhost:{port}/" [GET]
   3.  Logout Mentor: "/logout" [POST]
   4.  Recommend Student: "/recommendStudent" [POST]
 
+-------------------------------------------------------------------------------------------------------------------------------------------
 
 ##### All functionalities of Users and Mentors except Register and Login are authenticated with JSON Web Token (JWT)
