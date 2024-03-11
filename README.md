@@ -1,7 +1,6 @@
 # Backend Assignment for **Lean Platform Technologies**
 
-## **Neel Sheth | neel.s2@ahduni.edu.in | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)
-**
+## **Neel Sheth | neel.s2@ahduni.edu.in | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)**
 ### **API Endpoints**
 
 Home Page: "localhost:{port}/" [GET]
