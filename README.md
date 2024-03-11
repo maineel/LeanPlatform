@@ -20,7 +20,6 @@ Home Page: "localhost:{port}/" [GET]
   6.  Get Mentor Details: "/getMentorDetails" [GET]
   7.  Get Recommendation: "/getRecommendation" [GET]
 -------------------------------------------------------------------------------------------------------------------------------------------
-
 #### **Mentors**
 ##### Base URL: localhost:{port}/api/v1/mentors
   1.  Register Mentor: "/register" [POST]
