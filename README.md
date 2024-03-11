@@ -1,9 +1,11 @@
 # Backend Assignment for **Lean Platform Technologies**
 
 ## **Neel Sheth | neel.s2@ahduni.edu.in | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)**
-### **API Endpoints**
 
 Use command: **<ins>npm run dev</ins>** to start your local server
+
+-------------------------------------------------------------------------------------------------------------------------------------------
+### **API Endpoints**
 
 Home Page: "localhost:{port}/" [GET]
 
