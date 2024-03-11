@@ -3,7 +3,7 @@
 ## **Neel Sheth | neel.s2@ahduni.edu.in | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)**
 
 Use commands: 
-**<ins>npm install</ins>** to install all the dependencies
+**<ins>npm install</ins>** to install all the dependencies <br>
 **<ins>npm run dev</ins>** to start your local server
 
 -------------------------------------------------------------------------------------------------------------------------------------------
