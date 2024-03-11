@@ -8,7 +8,6 @@ Use command: **<ins>npm run dev</ins>** to start your local server
 ### **API Endpoints**
 
 Home Page: "localhost:{port}/" [GET]
--------------------------------------------------------------------------------------------------------------------------------------------
 
 #### **Users**
 ##### Base URL: localhost:{port}/api/v1/users
@@ -19,7 +18,7 @@ Home Page: "localhost:{port}/" [GET]
   5.  Review Mentor: "/reviewMentor" [POST]
   6.  Get Mentor Details: "/getMentorDetails" [GET]
   7.  Get Recommendation: "/getRecommendation" [GET]
--------------------------------------------------------------------------------------------------------------------------------------------
+
 #### **Mentors**
 ##### Base URL: localhost:{port}/api/v1/mentors
   1.  Register Mentor: "/register" [POST]
