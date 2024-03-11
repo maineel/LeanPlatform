@@ -38,7 +38,7 @@ const registerUser = asyncHandler(async (req, res) => {
     });
 
     const createdUser = await User.findById(user._id).select(
-        "-password -refreshToken"
+        "-password -refreshToken -createdAt -updatedAt -__v -recommendations"
     )
 
     if(!createdUser){
@@ -72,33 +72,26 @@ const loginUser = asyncHandler(async (req, res) => {
         secure: true,
     };
 
+    const userObj = await User.findById(user._id,{  password: 0, refreshToken: 0, createdAt: 0, updatedAt: 0, __v: 0 });
+    
     return res
     .status(200)
     .cookie('accessToken', accessToken, options)
     .cookie('refreshToken', refreshToken, options)
-    .json(
-        new ApiResponse(
-            200, 
-            {
-                user: user,
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            }, 
-            "User logged in successfully"
-        )
-    );
+    .json(new ApiResponse(200, userObj, "User logged in successfully!"));
 
 });
 
 const logoutUser = asyncHandler(async (req, res) => {
     
-    const user = req.user;
-    if(!user){
-        throw new ApiError(401, "User not found");
-    }
-
-    user.refreshToken = "";
-    await user.save();
+    await User.findByIdAndUpdate(req.user._id,
+        {
+            $unset: {refreshToken:1}
+        },
+        {
+            new:true
+        }
+    );
     const options = {
         httpOnly: true,
         secure: true,
@@ -107,13 +100,7 @@ const logoutUser = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(
-        new ApiResponse(
-            200, 
-            {},
-            "User logged out successfully!!"
-        )
-    )
+    .json(new ApiResponse(200, {},"User logged out successfully!"))
 });
 
 const rateMentor = asyncHandler(async (req, res) => {
@@ -145,10 +132,11 @@ const rateMentor = asyncHandler(async (req, res) => {
 
     await mentor.save();
 
+    const mentorRating = await Mentor.findById(mentorId).select("overallRating");
+
     return res
     .status(200)
-    .json(new ApiResponse(200, mentor, "Mentor rated successfully"))
-
+    .json(new ApiResponse(200, mentorRating, "Mentor rated successfully"))
 });
 
 const reviewMentor = asyncHandler(async (req, res) => {
@@ -173,16 +161,18 @@ const reviewMentor = asyncHandler(async (req, res) => {
     mentor.reviews.push({userId, review});
     await mentor.save();
 
+    const mentorReview = await Mentor.findById(mentorId).select("reviews");
+
     return res
     .status(200)
-    .json(new ApiResponse(200, mentor, "Mentor reviewed successfully"))
+    .json(new ApiResponse(200, mentorReview, "Mentor reviewed successfully"))
 });
 
 const getMentorDetails = asyncHandler(async (req, res) => {
-    const {mentorId, rating} = req.body;
+    const { rating} = req.body;
 
-    if(!mentorId || !rating && rating !== 0){
-        throw new ApiError(400, 'All fields are required');
+    if(!rating && rating !== 0){
+        throw new ApiError(400, 'Rating is required');
     }
 
     if(rating < 1 || rating > 5){
@@ -193,7 +183,7 @@ const getMentorDetails = asyncHandler(async (req, res) => {
         throw new ApiError(400, 'Rating should be an integer between 1 and 5');
     }
 
-    const mentor = await Mentor.find({"overallRating":rating},{name:1, email:1, overallRating:1, numRatings:1, reviews:1});
+    const mentor = await Mentor.find({"overallRating":rating},{name:1, email:1, overallRating:1, reviews:1});
 
     if(!mentor){
         throw new ApiError(404, `Mentors with given ${rating} not found`);
@@ -214,7 +204,7 @@ const getRecommendations = asyncHandler(async (req, res) => {
     const {link} = req.body;
     
     if(!link){
-        throw new ApiError(400, 'Link is required');
+        throw new ApiError(400, 'Recommendation Link is required');
     }
     
     const mentor = await Mentor.findOne({ 'recommendations.shareableLink': link }).select("-password -refreshToken -numRatings -overallRating -createdAt -updatedAt -__v -reviews -id");
@@ -224,8 +214,6 @@ const getRecommendations = asyncHandler(async (req, res) => {
     }
 
     const recommendation = mentor.recommendations.find(rec => rec.shareableLink === link);
-
-    const details = recommendation.userId;
 
     return res
     .status(200)

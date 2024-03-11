@@ -10,7 +10,7 @@ const verifyJWT = asyncHandler(async(req, res, next) => {
         const accessToken = req.cookies?.accessToken || req.header("Authorization")?.replace("Bearer ", "");
         
         if(!accessToken){
-            throw new ApiError(401, "No Access Token Found");
+            throw new ApiError(401, "Please login to access this functionality");
         }
 
         const decoded = jwt.verify(accessToken, process.env.ACCESS_TOKEN_SECRET);
@@ -18,7 +18,7 @@ const verifyJWT = asyncHandler(async(req, res, next) => {
         const mentor = await Mentor.findById(decoded?._id).select("-password -refreshToken");
     
         if(!mentor){
-            throw new ApiError(401, "Unauthorized");
+            throw new ApiError(401, "Mentor Unauthorized");
         }
     
         req.user = mentor;

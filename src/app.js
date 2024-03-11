@@ -12,6 +12,10 @@ app.use(express.json({limit: "16kb"}));
 app.use(express.urlencoded({extended: true, limit: "16kb"}));
 app.use(cookieParser());
 
+app.get('/', (req, res) => {
+    res.send('Lean Platform Technologies');
+});
+
 import { userRouter } from './routes/user.route.js';
 app.use('/api/v1/users', userRouter);
 

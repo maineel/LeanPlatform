@@ -39,7 +39,7 @@ const registerMentor = asyncHandler(async (req, res) => {
     });
 
     const createdMentor = await Mentor.findById(mentor._id).select(
-        "-password -refreshToken"
+        "-password -refreshToken -createdAt -updatedAt -__v -recommendations -reviews -overallRating -numRatings"
     )
 
     if(!createdMentor){
@@ -74,37 +74,26 @@ const loginMentor = asyncHandler(async (req, res) => {
         secure: true,
     };
 
+    const mentorObj = await Mentor.findById(mentor._id,{  password: 0, refreshToken: 0, createdAt: 0, updatedAt: 0, __v: 0, numRatings:0 });
+
     return res
     .status(200)
     .cookie('accessToken', accessToken, options)
     .cookie('refreshToken', refreshToken, options)
-    .json(
-        new ApiResponse(
-            200, 
-            {
-                mentor: mentor,
-                accessToken: accessToken,
-                refreshToken: refreshToken
-            }, 
-            "Mentor logged in successfully"
-        )
-    );
+    .json(new ApiResponse(200, mentorObj, "Mentor logged in successfully"));
 
 });
 
 const logoutMentor = asyncHandler(async (req, res) => {
 
-    const { _id } = req.user._id;
-
-    if(!_id){
-        throw new ApiError(401, "Mentor not found");
-    }
-
-    const mentor = await Mentor.findById(_id);
-
-    mentor.refreshToken = "";
-    await mentor.save();
-
+    await Mentor.findByIdAndUpdate(req.user._id,
+        {
+            $unset: {refreshToken:1}
+        },
+        {
+            new:true
+        }
+    )
     const options = {
         httpOnly: true,
         secure: true,
@@ -114,13 +103,8 @@ const logoutMentor = asyncHandler(async (req, res) => {
     .status(200)
     .clearCookie("accessToken", options)
     .clearCookie("refreshToken", options)
-    .json(
-        new ApiResponse(
-            200, 
-            {},
-            "Mentor logged out successfully!!"
-        )
-    )
+    .json(new ApiResponse(200,{},"Mentor logged out successfully!"))
+
 });
 
 
@@ -137,8 +121,8 @@ const recommendStudent = asyncHandler(async (req, res) => {
         throw new ApiError(404, 'Student not found');
     }
 
-    const mentor = await Mentor.findById(mentorId,{recommendations:1});
-
+    const mentor = await Mentor.findById(mentorId,{ password: 0, refreshToken: 0, createdAt: 0, updatedAt: 0, __v: 0, numRatings:0 });
+    
     if(!mentor){
         throw new ApiError(404, 'Mentor not found');
     }
@@ -162,7 +146,7 @@ const recommendStudent = asyncHandler(async (req, res) => {
 
     return res
     .status(200)
-    .json(new ApiResponse(200, {mentor}, "Student recommended successfully"))
+    .json(new ApiResponse(200, mentor, "Student recommended successfully"))
 
 });
 

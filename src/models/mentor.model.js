@@ -30,7 +30,7 @@ const mentorSchema = new mongoose.Schema({
     },
     reviews: [
         {
-            userId: {
+            studentId: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'User'
             },
