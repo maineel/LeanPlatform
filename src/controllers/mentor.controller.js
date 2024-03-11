@@ -126,9 +126,8 @@ const recommendStudent = asyncHandler(async (req, res) => {
     if(!mentor){
         throw new ApiError(404, 'Mentor not found');
     }
-
-    const link = "LeanPlatforms/recommendations/" + mentorId + "/" + studentId;
-
+    
+    const link = "LeanPlatforms/recommendations/" + mentorId + "/" + Date.now().toString();
     mentor.recommendations.push({
         studentId: studentId,
         recommendation: review,

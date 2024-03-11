@@ -213,8 +213,6 @@ const getRecommendations = asyncHandler(async (req, res) => {
         throw new ApiError(404, 'Recommendation not found');
     }
 
-    const recommendation = mentor.recommendations.find(rec => rec.shareableLink === link);
-
     return res
     .status(200)
     .json(new ApiResponse(200, {mentor}, "Recommendation fetched successfully"));
