@@ -1,6 +1,6 @@
 # Backend Assignment for **Lean Platform Technologies**
 
-## **Neel Sheth | neel.s2@ahduni.edu.in | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)**
+## **Neel Sheth | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)**
 
 Use commands: <br>
 **<ins>npm install</ins>** to install all the dependencies <br>
