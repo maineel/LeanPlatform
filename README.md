@@ -1,4 +1,4 @@
-# Backend Assignment for **Lean Platform Technologies**
+# Backend for **Lean Platform Technologies**
 
 ## **Neel Sheth | [LinkedIn](https://www.linkedin.com/in/neel-sheth-4779641bb/)**
 
